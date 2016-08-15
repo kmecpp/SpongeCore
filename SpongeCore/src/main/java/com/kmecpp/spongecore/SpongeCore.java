@@ -6,6 +6,7 @@ import org.slf4j.MarkerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
@@ -18,20 +19,35 @@ public abstract class SpongeCore {
 	//Effectively final variables
 	private static SpongeCore plugin;
 	private static Initializer initializer;
+	private static ConfigManager configManager;
 	private static Logger logger;
 
 	public SpongeCore() {
 		plugin = this;
-		initializer = getInitializer();
-		logger = LoggerFactory.getLogger(this.getClass().getName());
 	}
 
 	public static SpongeCore getPlugin() {
 		return plugin;
 	}
 
+	public static ConfigManager getConfigManager() {
+		return configManager;
+	}
+
 	//INITIALIZATION
+	public abstract String getPluginName();
+
 	public abstract Initializer getInitializer();
+
+	public abstract ConfigurationSpec getConfigurationSpec();
+
+	@Listener
+	public void onGameConstruction(GameConstructionEvent e) {
+		logger = LoggerFactory.getLogger(this.getClass().getName());
+		configManager = new ConfigManager(Sponge.getGame().getConfigManager().getPluginConfig(this));
+
+		initializer = getInitializer();
+	}
 
 	@Listener
 	public void onGameInitialization(GamePreInitializationEvent e) {

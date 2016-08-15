@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -106,16 +105,21 @@ public abstract class SpongeCommand implements CommandExecutor {
 
 			String shortestParentAliases = shortestAlias(getAliases());
 			ArrayList<Text> lines = new ArrayList<Text>();
-			for (Entry<List<String>, CommandSpec> entry : children.entrySet()) {
+			children.entrySet().stream().forEach((entry) -> {
 				lines.add(Text.of(
 						list.getCommandColor(), "/" + shortestParentAliases + " " + shortestAlias(entry.getKey().toArray(new String[0])) + " ",
 						list.getDescriptionColor(), entry.getValue().getShortDescription(src).orElse(Text.of("No description"))));
-			}
+			});
+			//			for (Entry<List<String>, CommandSpec> entry : children.entrySet()) {
+			//				lines.add(Text.of(
+			//						list.getCommandColor(), "/" + shortestParentAliases + " " + shortestAlias(entry.getKey().toArray(new String[0])) + " ",
+			//						list.getDescriptionColor(), entry.getValue().getShortDescription(src).orElse(Text.of("No description"))));
+			//			}
 
 			PaginationList.Builder page = Sponge.getServiceManager().provide(PaginationService.class).get().builder();
 			page.title(list.getTitle());
 			page.linesPerPage(10);
-			//			page.contents(lines);
+			page.contents(lines);
 			page.padding(Text.of(TextColors.YELLOW, TextStyles.STRIKETHROUGH, "-"));
 			page.sendTo(src);
 
@@ -147,7 +151,10 @@ public abstract class SpongeCommand implements CommandExecutor {
 	}
 
 	private static String shortestAlias(String[] aliases) {
-		return Arrays.stream(aliases).sorted((s1, s2) -> s1.length() - s2.length()).findFirst().get();
+		return Arrays.stream(aliases)
+				.sorted((s1, s2) -> s1.length() - s2.length())
+				.findFirst()
+				.get();
 	}
 
 }
