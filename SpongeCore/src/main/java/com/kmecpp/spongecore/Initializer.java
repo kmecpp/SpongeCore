@@ -8,4 +8,20 @@ public interface Initializer {
 
 	void postInit();
 
+	public static Initializer DEFAULT = new Initializer() {
+
+		@Override
+		public void preInit() {
+		}
+
+		@Override
+		public void postInit() {
+		}
+
+		@Override
+		public void init() {
+		}
+
+	};
+
 }

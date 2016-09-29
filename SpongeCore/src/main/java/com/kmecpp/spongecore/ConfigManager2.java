@@ -12,17 +12,17 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
-public class ConfigManager {
+public class ConfigManager2 {
 
 	private HashMap<CommentedConfigurationNode, Object> defaultNodes = new HashMap<CommentedConfigurationNode, Object>();
 
 	private ConfigurationLoader<CommentedConfigurationNode> loader;
 	private CommentedConfigurationNode root;
 
-	public ConfigManager(ConfigRoot configRoot) {
+	public ConfigManager2(ConfigRoot configRoot) {
 		loader = configRoot.getConfig();
 		try {
-			ConfigurationSpec configSpec = SpongeCore.getPlugin().getConfigurationSpec();
+			ConfigurationSpec configSpec = (ConfigurationSpec) new Object();// = SpongePlugin.getPlugin().getConfigurationSpec();
 			//			if (configSpec == null) {
 			//				configSpec = new ConfigurationSpec() {
 			//
@@ -50,14 +50,14 @@ public class ConfigManager {
 			configSpec.populate(spec);
 
 			defaultNodes.forEach((node, value) -> {
-				SpongeCore.log(Arrays.toString(node.getPath()) + ": " + value);
+				SpongePlugin.log(Arrays.toString(node.getPath()) + ": " + value);
 				if (node.isVirtual()) {
 				}
 			});
 
 			save(); //If loaded successfully
 		} catch (IOException e) {
-			SpongeCore.getLogger().error("Unable to load configuration file!");
+			SpongePlugin.logger().error("Unable to load configuration file!");
 			e.printStackTrace();
 		}
 		//		loader = HoconConfigurationLoader.builder().setPath(path).build();
@@ -88,7 +88,7 @@ public class ConfigManager {
 		try {
 			loader.save(root);
 		} catch (IOException e) {
-			SpongeCore.getLogger().error("Unable to save the configuration file!", e);
+			SpongePlugin.logger().error("Unable to save the configuration file!", e);
 		}
 	}
 

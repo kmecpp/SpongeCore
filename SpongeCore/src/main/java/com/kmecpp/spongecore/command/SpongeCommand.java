@@ -78,6 +78,10 @@ public abstract class SpongeCommand implements CommandExecutor {
 		this.description = description;
 	}
 
+	public void setDescription(String description) {
+		setDescription(Text.of(description));
+	}
+
 	public String[] getAliases() {
 		return aliases;
 	}
