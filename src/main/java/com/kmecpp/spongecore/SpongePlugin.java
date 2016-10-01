@@ -17,7 +17,7 @@ import com.kmecpp.spongecore.command.SpongeCommand;
 import com.kmecpp.spongecore.config.ConfigManager;
 import com.kmecpp.spongecore.event.SpongeListener;
 
-public abstract class SpongePlugin implements Causable, SpongeListener {
+public abstract class SpongePlugin implements SpongeListener {
 
 	//Effectively final variables
 	private static SpongePlugin plugin;
@@ -41,11 +41,6 @@ public abstract class SpongePlugin implements Causable, SpongeListener {
 
 	public static SpongePlugin getPlugin() {
 		return plugin;
-	}
-
-	@Override
-	public Object getCause() {
-		return pluginContainer;
 	}
 
 	public static PluginContainer getPluginContainer() {
