@@ -30,33 +30,32 @@ public class ConfigManager {
 			loader = Sponge.getGame().getConfigManager().getPluginConfig(SpongePlugin.getPlugin()).getConfig();
 
 			SpongeConfig spongeConfig = SpongePlugin.getConfig().getAnnotation(SpongeConfig.class);
-			if (spongeConfig != null) {
-				root = loader.load(ConfigurationOptions.defaults().setHeader(spongeConfig.header()));
-			}
+			root = spongeConfig != null
+					? loader.load(ConfigurationOptions.defaults().setHeader(spongeConfig.header()))
+					: loader.load();
 
 			keys = Arrays.stream(SpongePlugin.getConfig().getDeclaredFields())
 					.filter((field) -> Modifier.isStatic(field.getModifiers()) && field.getType() == ConfigKey.class)
 					.map((field) -> {
 						try {
 							field.setAccessible(true);
-							return (ConfigKey) field.get(null);
+							ConfigKey key = (ConfigKey) field.get(null);
+
+							//Load defaults
+							CommentedConfigurationNode node = root.getNode(key.getKey());
+							if (node.isVirtual()) {
+								node.setValue(key.getDefaultValue()); //Set default value if the node does not exist
+							}
+							key.setValue(node.getValue()); //Load stored value into the ConfigKey
+							if (!key.getComment().equals("")) {
+								node.setComment(key.getComment());//Overwrite comment after value has been set
+							}
+							return key;
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							throw new RuntimeException(e);
 						}
 					})
 					.collect(Collectors.toList());
-
-			keys.forEach((key) -> {
-				CommentedConfigurationNode node = root.getNode(key.getKey());
-				if (node.isVirtual()) {
-					node.setValue(key.getValue().asObject()); //Set value before comment
-				} else {
-					key.setValue(node.getValue());
-				}
-				if (!key.getComment().equals("")) {
-					node.setComment(key.getComment());//Overwrite comment
-				}
-			});
 			save();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -89,6 +88,7 @@ public class ConfigManager {
 	 *            the new value for the key
 	 */
 	public static void setValue(ConfigKey key, Object value) {
+		validateLoaded();
 		root.getNode(key.getPath()).setValue(value);
 	}
 
